@@ -3,18 +3,19 @@ import React from 'react';
 import './task-list.css';
 import Task from '../task';
 
-const TaskList = ({tasksData}) => {
-    const taskElements = tasksData.map((taskElement) => {
+const TaskList = (props) => {
+    const taskElements = props.tasksData.map((taskElement) => {
         return (
-            <Task {...taskElement}/>
+            <Task {...taskElement}
+                  onDelete={props.onDelete}/>
         );
     });
 
-                                       return (
-                                           <ul className="todo-list">
-                                             {taskElements}
-                                           </ul>
-                                       );
+    return (
+        <ul className="todo-list">
+          {taskElements}
+        </ul>
+    );
 };
 
 export default TaskList;
