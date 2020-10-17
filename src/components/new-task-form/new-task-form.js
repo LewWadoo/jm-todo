@@ -2,10 +2,40 @@ import React from 'react';
 
 import './new-task-form.css';
 
-const NewTaskForm = () => {
-    return (
-        <input className="new-todo" placeholder="What needs to be done?" autoFocus />
-    );
-};
+export default class NewTaskForm extends React.Component {
+    constructor(props) {
+        super(props);
 
-export default NewTaskForm;
+        this.state = {
+            label: ""
+        };
+        
+        this.handleSubmit = (event) => {
+            event.preventDefault();
+            this.props.onAdd(this.state.label);
+            this.setState({
+                label: ''
+            });
+        };
+
+        this.handleChange = (event) => {
+            this.setState({
+                label: event.target.value
+            });
+            
+        };
+    }
+
+    render() {
+        return (
+            <form
+              onSubmit={this.handleSubmit}>
+              <input className="new-todo"
+                     onChange={this.handleChange}
+                     value={this.state.label}
+placeholder="What needs to be done?"
+                     autoFocus />
+            </form>
+    );
+    }
+};
