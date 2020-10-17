@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import {formatDistanceToNow} from 'date-fns';
 
 export default class Task extends React.Component {
     render() {
@@ -11,7 +13,7 @@ export default class Task extends React.Component {
                        />
                 <label>
                   <span className="description">{this.props.description}</span>
-                  <span className="created">{this.props.created}</span>
+                  <span className="created">{formatDistanceToNow(this.props.createdDate)}</span>
                 </label>
                 <button className="icon icon-edit"
                         onClick={() => this.props.onToggleProperty("isEditing", this.props.id)}
@@ -22,3 +24,13 @@ export default class Task extends React.Component {
         );
     }
 }
+
+Task.propTypes = {
+    description: PropTypes.string,
+    isDone: PropTypes.bool,
+    isEditing: PropTypes.bool,
+    createdDate: PropTypes.instanceOf(Date),
+    id: PropTypes.number,
+    onToggleProperty: PropTypes.func,
+    onDelete: PropTypes.func
+};

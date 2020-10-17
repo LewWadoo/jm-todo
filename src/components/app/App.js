@@ -42,12 +42,9 @@ export default class App extends React.Component {
         };
         
         this.state = {
-            tasksData: [
-                this.createTask("Completed task", true),
-                this.createTask("Editing task", false, true),
-                this.createTask("Active task")
-            ],
-            filter: "All"
+            tasksData: this.props.initialTasks.map((task) => {
+                return this.createTask(task.description, task.isDone, task.isEditing);}),            
+            filter: this.props.filter
         };
 
         this.findIndexByID = (id) => {
@@ -128,6 +125,27 @@ export default class App extends React.Component {
                 };
             });
         };
+
+        this.finishEditing = (id) => {
+            this.setState((state) => {
+                const index = this.findIndexByID(id);
+
+                const modifiedTaskData = {
+                    ...state.tasksData[index],
+                    isEditing: false
+                };
+
+                const modifiedTasksData = [
+                    ...state.tasksData.slice(0, index),
+                    modifiedTaskData,
+                    ...state.tasksData.slice(index + 1)
+                ];
+                
+                return {
+                    tasksData: modifiedTasksData
+                };
+            });
+        };
     };
 
     render() {
@@ -145,6 +163,7 @@ export default class App extends React.Component {
                             onToggleProperty={this.toggleProperty}
                             filter={this.state.filter}
                             onChangeDescription={this.changeDescription}
+                            onFinishEditing={this.finishEditing}
                             onDelete={this.deleteTask}/>
                   <Footer
                     filter={this.state.filter}
