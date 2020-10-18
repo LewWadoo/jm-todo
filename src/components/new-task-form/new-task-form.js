@@ -23,7 +23,6 @@ export default class NewTaskForm extends React.Component {
             this.setState({
                 label: event.target.value
             });
-            
         };
     }
 

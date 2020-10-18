@@ -5,7 +5,7 @@ import TaskList from '../task-list';
 import Footer from '../footer';
 import NewTaskForm from '../new-task-form';
 
-import '../../index.css';
+// import '../../index.css';
 
 export default class App extends React.Component {
     constructor(props) {
