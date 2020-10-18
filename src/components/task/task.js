@@ -1,49 +1,36 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import {formatDistanceToNow} from 'date-fns';
 
 export default class Task extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            isDone: props.isDone,
-            isEditing: props.isEditing
-        };
-
-        this.toggleDone = () => {
-            this.setState((state) => {
-                return {
-                    isDone: !state.isDone
-                };
-            });
-        };
-    };
-
     render() {
-        const inputField = this.props.classStatus === "editing" ? <input type="text" className="edit" value="Editing task" /> : null;
-
-        let classNames = "";
-        if (this.state.isDone) {
-            classNames += " completed";
-        }
-        if (this.state.isEditing) {
-            classNames += " editing";
-        }
-        
         return (
-            <li className={classNames} key={this.props.id}>
               <div className="view">
-                <input className="toggle" type="checkbox"
-                  onClick={this.toggleDone}/>
+                <input
+                  className="toggle"
+                  onChange={() => this.props.onToggleProperty("isDone", this.props.id)}
+                  type="checkbox" checked={this.props.isDone}
+                       />
                 <label>
                   <span className="description">{this.props.description}</span>
-                  <span className="created">{this.props.created}</span>
+                  <span className="created">{formatDistanceToNow(this.props.createdDate)}</span>
                 </label>
-                <button className="icon icon-edit"></button>
+                <button className="icon icon-edit"
+                        onClick={() => this.props.onToggleProperty("isEditing", this.props.id)}
+                ></button>
                 <button className="icon icon-destroy"
                         onClick={() => this.props.onDelete(this.props.id)}></button>
               </div>
-              {inputField}
-            </li>
         );
     }
 }
+
+Task.propTypes = {
+    description: PropTypes.string,
+    isDone: PropTypes.bool,
+    isEditing: PropTypes.bool,
+    createdDate: PropTypes.instanceOf(Date),
+    id: PropTypes.number,
+    onToggleProperty: PropTypes.func,
+    onDelete: PropTypes.func
+};
