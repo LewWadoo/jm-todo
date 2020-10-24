@@ -55,9 +55,9 @@ export default class App extends React.Component {
       filter: initialFilter,
     };
 
-    const { tasksData } = this.state;
-
     this.findIndexByID = (id) => {
+      const { tasksData } = this.state;
+
       return tasksData.findIndex((task) => task.id === id);
     };
 
@@ -101,6 +101,8 @@ export default class App extends React.Component {
     };
 
     this.clearCompleted = () => {
+      const { tasksData } = this.state;
+
       const activeTasks = tasksData.filter((task) => !task.isDone);
 
       this.setState({
@@ -109,6 +111,8 @@ export default class App extends React.Component {
     };
 
     this.countActiveTasks = () => {
+      const { tasksData } = this.state;
+
       return tasksData.filter((task) => !task.isDone).length;
     };
 

@@ -25,14 +25,13 @@ Task.defaultProps = {
   description: '',
   isDone: false,
   createdDate: new Date(),
-  id: 0,
 };
 
 Task.propTypes = {
   description: PropTypes.string,
   isDone: PropTypes.bool,
   createdDate: PropTypes.instanceOf(Date),
-  id: PropTypes.number,
+  id: PropTypes.number.isRequired,
   onToggleProperty: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };
