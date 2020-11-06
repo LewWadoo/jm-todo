@@ -34,8 +34,10 @@ export default class NewTaskForm extends React.Component {
     const { label } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <input className="new-todo" onChange={this.handleChange} value={label} placeholder="What needs to be done?" />
+      <form onSubmit={this.handleSubmit} className="new-todo-form">
+        <input className="new-todo" onChange={this.handleChange} value={label} placeholder="Task" />
+        <input className="new-todo-form__timer" placeholder="Min" />
+        <input className="new-todo-form__timer" placeholder="Sec" />
       </form>
     );
   }
