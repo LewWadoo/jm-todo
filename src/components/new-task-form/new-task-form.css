@@ -38,3 +38,8 @@
 	width: 15%;
 	padding-left: 16px;
 }
+
+.new-todo-form .submit-button {
+    visibility: hidden;
+    width: 0;
+}

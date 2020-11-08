@@ -4,7 +4,16 @@ import PropTypes from 'prop-types';
 import './task-list.css';
 import Task from '../task';
 
-const TaskList = ({ tasksData, filter, onFinishEditing, onChangeDescription, onToggleProperty, onDelete }) => {
+const TaskList = ({
+  tasksData,
+  filter,
+  onFinishEditing,
+  onChangeDescription,
+  onToggleProperty,
+  onDelete,
+  play,
+  pause,
+}) => {
   const tasks = tasksData.map((taskData) => {
     if ((filter === 'Completed' && !taskData.isDone) || (filter === 'Active' && taskData.isDone)) {
       return null;
@@ -36,7 +45,7 @@ const TaskList = ({ tasksData, filter, onFinishEditing, onChangeDescription, onT
 
     return (
       <li className={classNames} key={taskData.id}>
-        <Task {...taskData} onToggleProperty={onToggleProperty} onDelete={onDelete} />
+        <Task {...taskData} onToggleProperty={onToggleProperty} onDelete={onDelete} play={play} pause={pause} />
         {inputField}
       </li>
     );
@@ -57,6 +66,8 @@ TaskList.propTypes = {
   onFinishEditing: PropTypes.func.isRequired,
   onToggleProperty: PropTypes.func.isRequired,
   tasksData: PropTypes.arrayOf(PropTypes.object),
+  play: PropTypes.func.isRequired,
+  pause: PropTypes.func.isRequired,
 };
 
 export default TaskList;

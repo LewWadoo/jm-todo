@@ -18,24 +18,27 @@ export default class App extends React.Component {
       return this.currentID;
     };
 
-    this.createTask = (
-      description,
-      isDone = false,
-      isEditing = false,
-      createdDate = new Date(),
-      id = this.incrementID()
-    ) => {
+    this.createTask = (description, seconds = 0, isDone = false, isEditing = false, createdDate = new Date()) => {
       return {
         description,
+        seconds,
         isDone,
         isEditing,
         createdDate,
-        id,
+        id: this.incrementID(),
+        interval: null,
       };
     };
 
-    this.addTask = (label) => {
-      const newTask = this.createTask(label);
+    this.convertToNumber = (string) => {
+      const integer = parseInt(string, 10);
+      return Number.isNaN(integer) ? 0 : integer;
+    };
+
+    this.addTask = (label, min = 0, sec = 0) => {
+      const minInt = this.convertToNumber(min);
+      const secInt = this.convertToNumber(sec);
+      const newTask = this.createTask(label, minInt * 60 + secInt);
 
       this.setState((state) => {
         const newTasksData = [...state.tasksData, newTask];
@@ -50,7 +53,8 @@ export default class App extends React.Component {
 
     this.state = {
       tasksData: initialTasks.map((task) => {
-        return this.createTask(task.description, task.isDone, task.isEditing);
+        const { description, isDone, isEditing, createdDate, seconds } = task;
+        return this.createTask(description, seconds, isDone, isEditing, createdDate);
       }),
       filter: initialFilter,
     };
@@ -61,13 +65,31 @@ export default class App extends React.Component {
       return tasksData.findIndex((task) => task.id === id);
     };
 
-    this.toggleProperty = (property, id) => {
-      this.setState((state) => {
-        const index = this.findIndexByID(id);
+    this.getChangedProperty = (property, task, changeVariant = 'toggle', value = null) => {
+      switch (changeVariant) {
+        case 'toggle':
+          return !task[property];
+        case 'increment':
+          return task[property] + 1;
+        case 'value':
+          return value;
+        default:
+          return value;
+      }
+    };
 
+    this.changeProperty = (property, id, changeVariant, propertyShouldNotBe = null, value = null) => {
+      const { tasksData } = this.state;
+      const index = this.findIndexByID(id);
+      if (tasksData[index][property] === propertyShouldNotBe) {
+        // eslint-disable-next-line no-console
+        console.log('change prop', property, this.state);
+        return false;
+      }
+      this.setState((state) => {
         const modifiedTaskData = {
-          ...state.tasksData[index],
-          [property]: !state.tasksData[index][property],
+          ...tasksData[index],
+          [property]: this.getChangedProperty(property, tasksData[index], changeVariant, value),
         };
 
         const modifiedTasksData = [
@@ -80,13 +102,21 @@ export default class App extends React.Component {
           tasksData: modifiedTasksData,
         };
       });
+
+      return true;
     };
 
     this.deleteTask = (id) => {
       this.setState((state) => {
         const index = this.findIndexByID(id);
+        const { tasksData } = state;
+        const { interval } = tasksData[index];
 
-        const newTasksData = [...state.tasksData.slice(0, index), ...state.tasksData.slice(index + 1)];
+        if (interval) {
+          clearInterval(interval);
+        }
+
+        const newTasksData = [...tasksData.slice(0, index), ...tasksData.slice(index + 1)];
 
         return {
           tasksData: newTasksData,
@@ -94,9 +124,9 @@ export default class App extends React.Component {
       });
     };
 
-    this.handleFilterChange = (newFilter) => {
+    this.handleFilterChange = (filter) => {
       this.setState({
-        filter: newFilter,
+        filter,
       });
     };
 
@@ -117,45 +147,44 @@ export default class App extends React.Component {
     };
 
     this.changeDescription = (description, id) => {
-      this.setState((state) => {
-        const index = this.findIndexByID(id);
-
-        const modifiedTaskData = {
-          ...state.tasksData[index],
-          description,
-        };
-
-        const modifiedTasksData = [
-          ...state.tasksData.slice(0, index),
-          modifiedTaskData,
-          ...state.tasksData.slice(index + 1),
-        ];
-
-        return {
-          tasksData: modifiedTasksData,
-        };
-      });
+      this.changeProperty('description', id, 'value', null, description);
     };
 
     this.finishEditing = (id) => {
-      this.setState((state) => {
-        const index = this.findIndexByID(id);
+      this.changeProperty('isEditing', id, 'toggle', false);
+    };
 
-        const modifiedTaskData = {
-          ...state.tasksData[index],
-          isEditing: false,
-        };
+    this.tick = (id) => {
+      this.changeProperty('seconds', id, 'increment');
+    };
 
-        const modifiedTasksData = [
-          ...state.tasksData.slice(0, index),
-          modifiedTaskData,
-          ...state.tasksData.slice(index + 1),
-        ];
+    this.play = (id) => {
+      const index = this.findIndexByID(id);
+      const { tasksData } = this.state;
+      const { isDone, interval } = tasksData[index];
+      if (isDone || interval !== null) {
+        return;
+      }
 
-        return {
-          tasksData: modifiedTasksData,
-        };
-      });
+      this.changeProperty(
+        'interval',
+        id,
+        'value',
+        0,
+        setInterval(() => this.tick(id), 1000)
+      );
+    };
+
+    this.pause = (id) => {
+      const index = this.findIndexByID(id);
+      const { tasksData } = this.state;
+      const { interval } = tasksData[index];
+      if (interval === null) {
+        return;
+      }
+
+      clearInterval(interval);
+      this.changeProperty('interval', id, 'value', null, null);
     };
   }
 
@@ -172,11 +201,14 @@ export default class App extends React.Component {
           <section className="main">
             <TaskList
               tasksData={tasksData}
-              onToggleProperty={this.toggleProperty}
+              /* onToggleProperty={this.toggleProperty} */
+              onToggleProperty={this.changeProperty}
               filter={filter}
               onChangeDescription={this.changeDescription}
               onFinishEditing={this.finishEditing}
               onDelete={this.deleteTask}
+              play={this.play}
+              pause={this.pause}
             />
             <Footer
               filter={filter}

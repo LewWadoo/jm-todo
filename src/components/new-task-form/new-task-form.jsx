@@ -11,33 +11,54 @@ export default class NewTaskForm extends React.Component {
 
     this.state = {
       label: initialLabel,
+      min: '',
+      sec: '',
     };
 
     this.handleSubmit = (event) => {
-      const { label } = this.state;
+      const { label, min, sec } = this.state;
 
       event.preventDefault();
-      onAdd(label);
+      onAdd(label, min, sec);
       this.setState({
         label: initialLabel,
+        min: '',
+        sec: '',
       });
     };
 
-    this.handleChange = (event) => {
+    this.handleChange = (event, property) => {
       this.setState({
-        label: event.target.value,
+        [property]: event.target.value,
       });
     };
   }
 
   render() {
-    const { label } = this.state;
+    const { label, min, sec } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit} className="new-todo-form">
-        <input className="new-todo" onChange={this.handleChange} value={label} placeholder="Task" />
-        <input className="new-todo-form__timer" placeholder="Min" />
-        <input className="new-todo-form__timer" placeholder="Sec" />
+      <form onSubmit={this.handleSubmit} className="new-todo-form" id="add-task">
+        <input
+          form="add-task"
+          className="new-todo"
+          onChange={(event) => this.handleChange(event, 'label')}
+          value={label}
+          placeholder="Task"
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          value={min}
+          onChange={(event) => this.handleChange(event, 'min')}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          value={sec}
+          onChange={(event) => this.handleChange(event, 'sec')}
+        />
+        <input type="submit" className="submit-button" />
       </form>
     );
   }
