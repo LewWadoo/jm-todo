@@ -5,66 +5,48 @@ import './tasks-filter.css';
 
 const classSelected = 'selected';
 
-export default class TasksFilter extends React.Component {
-  constructor(props) {
-    super(props);
+const TasksFilter = ({ onFilterChange }) => {
+  const getFilterButtons = () => {
+    return document.querySelectorAll('.filters button');
+  };
 
-    this.getFilterButtons = () => {
-      return document.querySelectorAll('.filters button');
-    };
+  const onClick = (event) => {
+    if (event.target.classList.contains(classSelected)) {
+      return;
+    }
 
-    const { onFilterChange } = props;
+    const buttons = getFilterButtons();
+    for (const button of buttons) {
+      button.classList.remove(classSelected);
+    }
 
-    this.selectButtonByFilter = (filter) => {
-      const buttons = this.getFilterButtons();
+    event.target.classList.add(classSelected);
+    onFilterChange(event.target.textContent);
+  };
 
-      for (const button of buttons) {
-        if (button.textContent === filter) {
-          if (!button.classList.contains(classSelected)) {
-            button.classList.add(classSelected);
-          }
-        }
-      }
-    };
-
-    this.onClick = (event) => {
-      if (event.target.classList.contains(classSelected)) {
-        return;
-      }
-
-      const buttons = this.getFilterButtons();
-      for (const button of buttons) {
-        button.classList.remove(classSelected);
-      }
-
-      event.target.classList.add(classSelected);
-      onFilterChange(event.target.textContent);
-    };
-  }
-
-  render() {
-    return (
-      <ul className="filters">
-        <li>
-          <button className="selected" type="button" onClick={this.onClick}>
-            All
-          </button>
-        </li>
-        <li>
-          <button type="button" onClick={this.onClick}>
-            Active
-          </button>
-        </li>
-        <li>
-          <button type="button" onClick={this.onClick}>
-            Completed
-          </button>
-        </li>
-      </ul>
-    );
-  }
-}
+  return (
+    <ul className="filters">
+      <li>
+        <button className="selected" type="button" onClick={onClick}>
+          All
+        </button>
+      </li>
+      <li>
+        <button type="button" onClick={onClick}>
+          Active
+        </button>
+      </li>
+      <li>
+        <button type="button" onClick={onClick}>
+          Completed
+        </button>
+      </li>
+    </ul>
+  );
+};
 
 TasksFilter.propTypes = {
   onFilterChange: PropTypes.func.isRequired,
 };
+
+export default TasksFilter;
