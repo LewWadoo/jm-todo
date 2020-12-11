@@ -11,26 +11,32 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
 
+    this.initialTasks = [
+      {
+        description: 'Completed task',
+      },
+      {
+        description: 'Editing task',
+      },
+      {
+        description: 'Active task',
+      },
+    ];
+
     this.currentID = 1;
 
     this.incrementID = () => {
-      this.currentID += this.currentID + 1;
+      this.currentID += 1;
       return this.currentID;
     };
 
-    this.createTask = (
-      description,
-      isDone = false,
-      isEditing = false,
-      createdDate = new Date(),
-      id = this.incrementID()
-    ) => {
+    this.createTask = (description) => {
       return {
         description,
-        isDone,
-        isEditing,
-        createdDate,
-        id,
+        isDone: false,
+        isEditing: false,
+        createdDate: new Date(),
+        id: this.incrementID(),
       };
     };
 
@@ -46,11 +52,11 @@ export default class App extends React.Component {
       });
     };
 
-    const { initialTasks, initialFilter } = this.props;
+    const { initialFilter } = this.props;
 
     this.state = {
-      tasksData: initialTasks.map((task) => {
-        return this.createTask(task.description, task.isDone, task.isEditing);
+      tasksData: this.initialTasks.map((task) => {
+        return this.createTask(task.description);
       }),
       filter: initialFilter,
     };
@@ -192,11 +198,9 @@ export default class App extends React.Component {
 }
 
 App.defaultProps = {
-  initialTasks: [],
   initialFilter: 'All',
 };
 
 App.propTypes = {
-  initialTasks: PropTypes.arrayOf(PropTypes.object),
   initialFilter: PropTypes.oneOf(['All', 'Active', 'Completed']),
 };
