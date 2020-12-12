@@ -1,8 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { formatDistanceToNow } from 'date-fns';
 
-const Task = (props) => {
+const Task = ({ description, isDone, createdDate, id, seconds, onToggleProperty, onDelete, onTick }) => {
+  const [timer, setTimer] = useState(null);
+
+  useEffect(() => {
+    return () => clearInterval(timer);
+  }, [timer]);
+
+  const play = () => {
+    if (isDone || timer) {
+      return;
+    }
+
+    setTimer(setInterval(onTick, 1000, id));
+  };
+
+  const pause = () => {
+    if (!timer) {
+      return;
+    }
+
+    clearInterval(timer);
+    setTimer(null);
+  };
+
   // https://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
   const formatTime = (sec) => {
     return [Math.floor(sec / 60 / 60), Math.floor((sec / 60) % 60), Math.floor(sec % 60)]
@@ -11,12 +34,9 @@ const Task = (props) => {
   };
 
   const toggleDone = () => {
-    const { isDone, id, onToggleProperty, pause } = props;
     onToggleProperty('isDone', id, 'toggle', !isDone);
-    setTimeout(pause.bind(this, id));
+    setTimeout(pause);
   };
-
-  const { description, isDone, createdDate, id, seconds, onToggleProperty, onDelete, play, pause } = props;
 
   return (
     <div className="view">
@@ -56,8 +76,7 @@ Task.propTypes = {
   seconds: PropTypes.number,
   onToggleProperty: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  play: PropTypes.func.isRequired,
-  pause: PropTypes.func.isRequired,
+  onTick: PropTypes.func.isRequired,
 };
 
 export default Task;

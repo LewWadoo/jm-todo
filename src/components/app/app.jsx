@@ -8,25 +8,12 @@ import Footer from '../footer';
 import NewTaskForm from '../new-task-form';
 
 const App = ({ initialTasks, initialFilter }) => {
-  const createTask = (
-    description,
-    seconds = 0,
-    isDone = false,
-    isEditing = false,
-    createdDate = new Date(),
-    id = window.id
-  ) => {
-    // eslint-disable-next-line no-console
-    console.log('in createTask:  id', id);
+  const createTask = (description, seconds) => {
     window.id += 1;
     return {
       description,
       seconds,
-      isDone,
-      isEditing,
-      createdDate,
-      id,
-      interval: null,
+      id: window.id,
     };
   };
 
@@ -38,9 +25,9 @@ const App = ({ initialTasks, initialFilter }) => {
     window.id = 0;
     setTasksData(
       initialTasks.map((task) => {
-        const { description, isDone, isEditing, createdDate, seconds } = task;
+        const { description, seconds } = task;
 
-        return createTask(description, seconds, isDone, isEditing, createdDate);
+        return createTask(description, seconds);
       })
     );
   }, [initialTasks]);
@@ -54,8 +41,6 @@ const App = ({ initialTasks, initialFilter }) => {
     const minInt = convertToNumber(min);
     const secInt = convertToNumber(sec);
     const newTask = createTask(label, minInt * 60 + secInt);
-    // eslint-disable-next-line no-console
-    console.log('in addTask:  newTask', newTask);
 
     setTasksData((tasks) => {
       return [...tasks, newTask];
@@ -85,8 +70,6 @@ const App = ({ initialTasks, initialFilter }) => {
       if (tasks[index][property] === propertyShouldNotBe) {
         return tasks;
       }
-      // eslint-disable-next-line no-console
-      console.log('in changeProperty before setTasksData:  tasksData, id, index', tasksData, id, index);
 
       const modifiedTaskData = {
         ...tasks[index],
@@ -95,9 +78,6 @@ const App = ({ initialTasks, initialFilter }) => {
 
       const modifiedTasksData = [...tasks.slice(0, index), modifiedTaskData, ...tasks.slice(index + 1)];
 
-      // eslint-disable-next-line no-console
-      console.log('in changeProperty:  modifiedTasksData, id, index', modifiedTasksData, id, index);
-
       return modifiedTasksData;
     });
   };
@@ -105,11 +85,6 @@ const App = ({ initialTasks, initialFilter }) => {
   const deleteTask = (id) => {
     setTasksData((tasks) => {
       const index = findIndexByID(id, tasks);
-      const { interval } = tasks[index];
-
-      if (interval) {
-        clearInterval(interval);
-      }
 
       return [...tasks.slice(0, index), ...tasks.slice(index + 1)];
     });
@@ -137,33 +112,6 @@ const App = ({ initialTasks, initialFilter }) => {
     changeProperty('seconds', id, 'increment');
   };
 
-  const play = (id) => {
-    const index = findIndexByID(id, tasksData);
-    const { isDone, interval } = tasksData[index];
-
-    // eslint-disable-next-line no-console
-    console.log('in play:  interval, id', interval, id);
-    // eslint-disable-next-line no-debugger
-    // debugger;
-
-    if (isDone || interval !== null) {
-      return;
-    }
-
-    changeProperty('interval', id, 'value', 0, setInterval(tick, 1000, id));
-  };
-
-  const pause = (id) => {
-    const index = findIndexByID(id, tasksData);
-    const { interval } = tasksData[index];
-    if (interval === null) {
-      return;
-    }
-
-    clearInterval(interval);
-    changeProperty('interval', id, 'value', null, null);
-  };
-
   return (
     <div>
       <section className="todoapp">
@@ -179,8 +127,7 @@ const App = ({ initialTasks, initialFilter }) => {
             onChangeDescription={changeDescription}
             onFinishEditing={finishEditing}
             onDelete={deleteTask}
-            play={play}
-            pause={pause}
+            onTick={tick}
           />
           <Footer
             filter={filter}
